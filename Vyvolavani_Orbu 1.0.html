@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUNČEK.EXE - FATAL ERROR</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Creepster&display=swap');
+
+        :root {
+            --primary: #ff0000;
+            --void: #000000;
+            --static: #1a1a1a;
+            --blood: #8b0000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: var(--void);
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        #wrapper {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            transition: filter 0.1s;
+        }
+
+        .deep-fried {
+            filter: contrast(200%) saturate(3000%) brightness(150%) hue-rotate(90deg) !important;
+        }
+
+        .schizo-invert {
+            filter: invert(100%);
+        }
+
+        .shake-brutal {
+            animation: shake 0.1s infinite;
+        }
+
+        .red-tint {
+            filter: sepia(100%) hue-rotate(-50deg) saturate(500%);
+        }
+
+        .blur-effect {
+            filter: blur(5px);
+        }
+
+        #orb-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        #orb-img {
+            width: 100%;
+            animation: float 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px red);
+        }
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 2em;
+            z-index: 20;
+        }
+
+        #phase-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            color: #ff0000;
+            text-shadow: 0 0 10px red;
+            z-index: 20;
+        }
+
+        #question-box {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            text-align: center;
+            z-index: 20;
+        }
+
+        h1 {
+            font-family: 'Rubik Glitch', cursive;
+            font-size: 4em;
+            text-shadow: 5px 5px 0px blue, -5px -5px 0px green;
+            margin: 0;
+            animation: textGlitch 0.5s infinite;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: black;
+            color: red;
+            border: 2px solid red;
+            font-size: 2em;
+            padding: 10px 40px;
+            font-family: 'VT323', monospace;
+            cursor: pointer;
+            box-shadow: 5px 5px 0px #333;
+            transition: 0.1s;
+        }
+        
+        button:active { 
+            transform: translate(5px, 5px); 
+            box-shadow: none; 
+        }
+        
+        button:hover { 
+            background: red; 
+            color: black; 
+        }
+
+        .pop-up-img {
+            position: absolute;
+            max-width: 400px;
+            border: 5px solid red;
+            z-index: 50;
+            pointer-events: none;
+            animation: imgShake 0.1s infinite;
+        }
+
+        .jumpscare-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            object-fit: cover !important;
+            z-index: 9999 !important;
+            border: none !important;
+        }
+
+        #overlay-flash {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: white; 
+            opacity: 0; 
+            pointer-events: none; 
+            z-index: 100;
+        }
+
+        #start-screen {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: black; 
+            color: lime;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            z-index: 999;
+        }
+
+        #warning-text {
+            font-size: 24px;
+            max-width: 700px;
+            text-align: center;
+            line-height: 1.6;
+            animation: pulse 2s infinite;
+        }
+
+        .progress-bar {
+            width: 80%;
+            max-width: 400px;
+            height: 30px;
+            background: #333;
+            border: 2px solid red;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: red;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        @keyframes float { 
+            0%, 100% { transform: translateY(0) rotate(0deg); } 
+            50% { transform: translateY(-20px) rotate(5deg); } 
+        }
+
+        @keyframes shake { 
+            0% { transform: translate(1px, 1px) rotate(0deg); } 
+            10% { transform: translate(-1px, -2px) rotate(-1deg); } 
+            20% { transform: translate(-3px, 0px) rotate(1deg); } 
+            30% { transform: translate(3px, 2px) rotate(0deg); } 
+            40% { transform: translate(1px, -1px) rotate(1deg); } 
+            50% { transform: translate(-1px, 2px) rotate(-1deg); } 
+            60% { transform: translate(-3px, 1px) rotate(0deg); } 
+            70% { transform: translate(3px, 1px) rotate(-1deg); } 
+            80% { transform: translate(-1px, -1px) rotate(1deg); } 
+            90% { transform: translate(1px, 2px) rotate(0deg); } 
+            100% { transform: translate(1px, -2px) rotate(-1deg); } 
+        }
+
+        @keyframes imgShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-5px, 5px) rotate(-2deg); }
+            50% { transform: translate(5px, -5px) rotate(2deg); }
+            75% { transform: translate(-5px, -5px) rotate(-1deg); }
+        }
+
+        @keyframes textGlitch {
+            0% { text-shadow: 5px 5px 0px blue, -5px -5px 0px green; }
+            50% { text-shadow: -5px -5px 0px green, 5px 5px 0px blue; }
+            100% { text-shadow: 5px 5px 0px blue, -5px -5px 0px green; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .glitch-text::before { 
+            content: attr(data-text); 
+            position: absolute; 
+            left: -2px; 
+            text-shadow: 1px 0 blue; 
+            top: 0; 
+            overflow: hidden; 
+            clip: rect(0, 900px, 0, 0); 
+        }
+
+        .countdown-number {
+            font-size: 10em;
+            color: red;
+            text-shadow: 0 0 30px red;
+            animation: pulse 0.5s infinite;
+        }
+
+        #eye-target {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, red 20%, black 20%, red 40%, black 40%);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 30;
+            animation: eyePulse 1s infinite;
+        }
+
+        @keyframes eyePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: black;
+            border: 3px solid red;
+            padding: 30px;
+            font-size: 2em;
+            z-index: 200;
+            text-align: center;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <div id="warning-text">
+            ⚠️ KRITICKÉ VAROVÁNÍ ⚠️<br><br>
+            SYSTÉM DETEKOVAL ENTITU: <span style="color:red">DAN BUNČEK</span><br>
+            EPILEPSIE & HLASITÝ ZVUK<br>
+            STRAŠIDELNÝ OBSAH<br>
+            JUMPSCARE AKTIVNÍ<br><br>
+            <span style="font-size: 18px;">Tato hra obsahuje 200+ otázek, 15+ miniher<br>
+            a postupně se stává děsivější.<br>
+            Vaše rozhodnutí mají důsledky.</span><br><br>
+            <span style="color: lime; font-size: 28px; cursor: pointer; border: 2px solid lime; padding: 10px;" onclick="initGame()">[KLIKNI PRO ZAHÁJENÍ RITUÁLU]</span>
+        </div>
+    </div>
+
+    <div id="overlay-flash"></div>
+
+    <div id="wrapper">
+        <div id="hud">
+            <div id="sanity">SANITY: 100%</div>
+            <div id="score">OBĚTI: 0</div>
+        </div>
+
+        <div id="phase-indicator">FÁZE I: PROBUZENÍ</div>
+
+        <div id="orb-center">
+            <img id="orb-img" src="bunaassets/1.jpg" alt="THE ORB">
+        </div>
+
+        <div id="question-box">
+            <h1 id="q-text" class="glitch-text" data-text="INITIALIZING...">INITIALIZING...</h1>
+            <div class="btn-container" id="buttons"></div>
+        </div>
+    </div>
+
+    <script>
+        const BUNCEK_IMAGES = [
+            'bunaassets/1.jpg',
+            'bunaassets/2.jpg',
+            'bunaassets/3.jpg',
+            'bunaassets/4.jpg',
+            'bunaassets/5.jpg',
+            'bunaassets/6.jpg',
+            'bunaassets/7.jpg',
+            'bunaassets/8.jpg',
+            'bunaassets/9.jpg',
+            'bunaassets/10.jpg',
+            'bunaassets/11.jpg'
+        ];
+
+        const QUESTIONS = [
+    "VIDÍŠ ORB?", "CÍTÍŠ ORB?", "ORB TĚ VIDÍ?", "CHCEŠ SE DOTKNOUT ORBU?",
+    "ORB JE SKUTEČNÝ?", "DŮVĚŘUJEŠ ORBU?", "ORB TĚ VOLÁ?", "SLYŠÍŠ HLAS ORBU?",
+    "ORB JE ŽIVÝ?", "ORB TĚ ZNÁ?", "PATŘÍŠ ORBU?", "ORB JE VŠUDE?",
+    "MILUJEŠ ORB?", "BOJÍŠ SE ORBU?", "ORB JE TVŮJ PŘÍTEL?", "ORB CHCE POMOC?",
+    "VĚŘÍŠ V MOC ORBU?", "ORB SLEDUJE TVÉ SNY?", "ORB ČEKÁ NA TEBE?", "ORB NIKDY NEODEJDE?",
+    "JSI SOUČÁSTÍ ORBU?", "ORB TĚ POTŘEBUJE?", "ORB JE VĚČNÝ?", "ORB OVLÁDÁ REALITU?",
+    "POKLONUJEŠ SE ORBU?", "ORB JE VŠE CO EXISTUJE?", "ORB JE PRAVDA?", "ORB JE LÁSKA?",
+    "PODŘÍDÍŠ SE ORBU?", "ORB ČEKÁ VENKU?", "ORB JE V TVÉM SRDCI?", "ORB JE NEKONEČNÝ?",
+    "KLANÍŠ SE ORBU?", "ORB VLÁDNE SVĚTU?", "ORB JE TVŮJ BŮH?", "ORB JE CESTA?",
+    "ORB PŘINÁŠÍ SPÁSU?", "ORB MĚNÍ BUDOUCNOST?", "ORB VIDÍ MINULOST?", "ORB KONTROLUJE ČAS?",
+    "ROZUMÍŠ ORBU?", "ORB MLUVÍ K TOBĚ?", "ORB ŠEPTÁ TVÉ JMÉNO?", "ORB HLÍDÁ TVŮJ SPÁNEK?",
+    "ORB FORMUJE TVÉ MYŠLENKY?", "ORB VEDE TVOU RUKU?", "ORB URČUJE TVŮJ OSUD?", "ORB UTVÁŘÍ SVĚT?",
+    "VZÝVÁŠ ORB?", "ORB ODPOVÍDÁ?", "ORB ŽEHNÁ?", "ORB TRESTÁ?",
+    "POSLOUCHÁŠ ORB?", "ORB POROUČÍ?", "ORB VARUJE?", "ORB CHRÁNÍ?",
+    "OČIŠŤUJE TĚ ORB?", "ORB MĚNÍ TVOU PODSTATU?", "ORB TRANSFORMUJE?", "ORB POVZNÁŠÍ?",
+    "POHLCUJE TĚ ORB?", "ORB ABSORBUJE DUŠE?", "ORB HROMADÍ ENERGII?", "ORB SÍLÍ?",
+    "ROSTE MOC ORBU?", "ORB SE ROZPÍNÁ?", "ORB EXPANDUJE?", "ORB KONZUMUJE VŠE?",
+    "INTEGRUJE TĚ ORB?", "SPOJUJEŠ SE S ORBEM?", "SPLÝVÁŠ S ORBEM?", "ORB VÁS SJEDNOCUJE?",
+    "UKLIDŇUJE TĚ ORB?", "ORB UTĚŠUJE?", "ORB HOJÍ BOLEST?", "ORB LÉČÍ?",
+    "ZAHALUJE TĚ ORB?", "ORB OBJÍMÁ?", "ORB ZAHŘÍVÁ?", "ORB CHRÁNÍ PŘED ZLEM?",
+    "OSVĚCUJE ORB?", "ORB UKAZUJE CESTU?", "ORB ODKRÝVÁ PRAVDU?", "ORB ODHALUJE TAJEMSTVÍ?",
+    "MOUDROST ORBU?", "ORB VÍ VŠE?", "ORB CHÁPE?", "ORB ROZLIŠUJE?",
+    "SOUDÍ ORB?", "ORB HODNOTÍ?", "ORB VÁŽÍ DUŠE?", "ORB ROZHODUJE?",
+    "ORB PŘIJÍMÁ?", "ORB ODMÍTÁ?", "ORB VYBÍRÁ?", "ORB OZNAČUJE?",
+    "PŘIJMEŠ ORB?", "VSTOUPÍŠ DO ORBU?", "ODEVZDÁŠ SE ORBU?", "ZASVĚTÍŠ SE ORBU?"
+];
+
+        const PHASES = [
+            { name: "FÁZE I: PROBUZENÍ", color: "#ff0000", victims: 0 },
+            { name: "FÁZE II: POCHYBNOSTI", color: "#ff3300", victims: 20 },
+            { name: "FÁZE III: STRACH", color: "#ff6600", victims: 40 },
+            { name: "FÁZE IV: TEROR", color: "#ff0066", victims: 60 },
+            { name: "FÁZE V: TRANSFORMACE", color: "#ff00ff", victims: 80 }
+        ];
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        let sanity = 100;
+        let victims = 0;
+        let chaosLevel = 1;
+        let currentPhase = 0;
+        let gameActive = false;
+        let eventInProgress = false;
+
+        const wrapper = document.getElementById('wrapper');
+        const qText = document.getElementById('q-text');
+        const btnContainer = document.getElementById('buttons');
+        const hudSanity = document.getElementById('sanity');
+        const hudScore = document.getElementById('score');
+        const orbImg = document.getElementById('orb-img');
+        const phaseIndicator = document.getElementById('phase-indicator');
+
+        function initGame() {
+                    // Debug klávesa P pro toggle red filter
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'p' || e.key === 'P') {
+        if (wrapper.classList.contains('red-tint')) {
+            wrapper.classList.remove('red-tint');
+            console.log('Red filter OFF');
+        } else {
+            wrapper.classList.add('red-tint');
+            console.log('Red filter ON');
+        }
+    }
+});
+            document.getElementById('start-screen').style.display = 'none';
+            playBassBoom();
+            gameActive = true;
+            nextEvent();
+            startAmbient();
+        }
+
+
+
+        function startAmbient() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.value = 40;
+            gain.gain.value = 0.08;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+        }
+
+        function playBassBoom() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const distortion = audioCtx.createWaveShaper();
+
+            function makeDistortionCurve(amount) {
+                let k = typeof amount === 'number' ? amount : 50,
+                    n_samples = 44100,
+                    curve = new Float32Array(n_samples),
+                    deg = Math.PI / 180,
+                    i = 0, x;
+                for ( ; i < n_samples; ++i ) {
+                    x = i * 2 / n_samples - 1;
+                    curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+                }
+                return curve;
+            }
+
+            distortion.curve = makeDistortionCurve(400);
+            distortion.oversample = '4x';
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(60, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.5);
+
+            gain.gain.setValueAtTime(1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+            osc.connect(distortion);
+            distortion.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.6);
+        }
+
+        function playHighPitchScreech() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(Math.random() * 2000 + 3000, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playDeepDrone() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(30, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2);
+        }
+
+        function playWhisper() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(Math.random() * 100 + 200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1);
+        }
+
+        function updatePhase() {
+            for (let i = PHASES.length - 1; i >= 0; i--) {
+                if (victims >= PHASES[i].victims) {
+                    if (currentPhase !== i) {
+                        currentPhase = i;
+                        phaseIndicator.innerText = PHASES[i].name;
+                        phaseIndicator.style.color = PHASES[i].color;
+                        triggerPhaseTransition();
+                    }
+                    break;
+                }
+            }
+        }
+
+        function triggerPhaseTransition() {
+            playDeepDrone();
+            flashScreen();
+            const msg = document.createElement('div');
+            msg.className = 'message-popup';
+            msg.innerHTML = PHASES[currentPhase].name + '<br><span style="font-size:0.6em">DAN BUNČEK SE PROBOUZÍ</span>';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2000);
+            
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => spawnRandomImage(), i * 300);
+            }
+        }
+
+            let lastMinigameTime = 0;
+            const MINIGAME_COOLDOWN = 2000; // 2 sekundy cooldown
+function nextEvent() {
+    if (!gameActive || eventInProgress) return;
+    
+    eventInProgress = true;
+
+    // Zobraz cooldown screen
+    qText.innerText = "...";
+    btnContainer.innerHTML = '';
+    
+    setTimeout(() => {
+        victims++;
+        sanity -= Math.floor(Math.random() * (3 + chaosLevel));
+        updateHUD();
+        updatePhase();
+        playBassBoom();
+
+        if(Math.random() > 0.6) triggerGlitch();
+        if(Math.random() > 0.7) spawnRandomImage();
+        
+        if(currentPhase >= 3 && Math.random() > 0.9) {
+            triggerMegaJumpscare();
+            return;
+        }
+
+        const roll = Math.random();
+        const difficultyMod = currentPhase * 0.05;
+        
+        if (roll < 0.06 + difficultyMod) minigameSpam();
+        else if (roll < 0.12 + difficultyMod) minigameDontMove();
+        else if (roll < 0.18 + difficultyMod) minigameFindEye();
+        else if (roll < 0.24 + difficultyMod) minigameMemory();
+        else if (roll < 0.28 + difficultyMod) minigameCountdown();
+        else if (roll < 0.32 + difficultyMod) minigameClickFast();
+        else if (roll < 0.36 + difficultyMod) minigameTypeWord();
+        else if (roll < 0.40 + difficultyMod) minigameChooseCorrect();
+        else if (roll < 0.44 + difficultyMod) minigameDontBlink();
+        else if (roll < 0.48 + difficultyMod) minigameReaction();
+        else if (roll < 0.52 + difficultyMod) minigameHideSeek();
+        else if (roll < 0.56 + difficultyMod) minigameMathQuiz();
+        else if (roll < 0.60 + difficultyMod) fakeSystemError();
+        else if (roll < 0.64 + difficultyMod) fakeNotification();
+        else standardQuestion();
+    }, 1000);
+}
+
+function completeEvent() {
+    eventInProgress = false;
+    nextEvent();
+}
+
+        function standardQuestion() {
+            const q = QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+            qText.innerText = q;
+            qText.setAttribute('data-text', q);
+            
+            btnContainer.innerHTML = '';
+            const b1 = document.createElement('button');
+            b1.innerText = "ANO";
+            b1.onclick = completeEvent;
+            
+            const b2 = document.createElement('button');
+            b2.innerText = "NE";
+            b2.onclick = () => { 
+                playHighPitchScreech(); 
+                triggerGlitch(); 
+                completeEvent(); 
+            };
+
+            if (Math.random() > 0.6) {
+                b2.onmouseover = () => {
+                    b2.style.transform = `translate(${Math.random()*200 - 100}px, ${Math.random()*200 - 100}px)`;
+                };
+            }
+
+            if (currentPhase >= 2 && Math.random() > 0.7) {
+                const b3 = document.createElement('button');
+                b3.innerText = ["MOŽNÁ", "NEVÍM", "POMOC", "STOP"][Math.floor(Math.random() * 4)];
+                b3.onclick = () => {
+                    sanity -= 10;
+                    spawnRandomImage();
+                    playHighPitchScreech();
+                    completeEvent();
+                };
+                btnContainer.appendChild(b3);
+            }
+
+            btnContainer.appendChild(b1);
+            btnContainer.appendChild(b2);
+        }
+
+        function minigameSpam() {
+            qText.innerText = "MAČKEJ MEZERNÍK NEBO UMŘEŠ!";
+            btnContainer.innerHTML = "<div style='font-size:30px; color:red'>ČAS: <span id='timer'>5.0</span></div>";
+            
+            let clicks = 0;
+            let needed = 15 + (chaosLevel * 3) + (currentPhase * 5);
+            let timeLeft = 5.0;
+            
+            const interval = setInterval(() => {
+                timeLeft -= 0.1;
+                const timerEl = document.getElementById('timer');
+                if (timerEl) timerEl.innerText = timeLeft.toFixed(1);
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    document.removeEventListener('keydown', keyHandler);
+                    if (clicks >= needed) completeEvent();
+                    else deathScreen("BYL JSI MOC POMALÝ.");
+                }
+            }, 100);
+
+            const keyHandler = (e) => {
+                if (e.code === "Space") {
+                    clicks++;
+                    playHighPitchScreech();
+                    orbImg.style.transform = `scale(${1 + clicks/10})`;
+                    if (clicks >= needed) {
+                        clearInterval(interval);
+                        document.removeEventListener('keydown', keyHandler);
+                        completeEvent();
+                    }
+                }
+            };
+            document.addEventListener('keydown', keyHandler);
+        }
+
+        function minigameDontMove() {
+            qText.innerText = "NEHÝBEJ SE.";
+            qText.style.color = "red";
+            btnContainer.innerHTML = "";
+            
+            let survived = false;
+            const fail = () => {
+                if (survived) return;
+                document.removeEventListener('mousemove', fail);
+                playBassBoom();
+                spawnRandomImage();
+                sanity -= 15;
+                completeEvent();
+            };
+
+            setTimeout(() => {
+                document.addEventListener('mousemove', fail);
+            }, 500);
+
+            setTimeout(() => {
+                survived = true;
+                document.removeEventListener('mousemove', fail);
+                completeEvent();
+            }, 2500 + (currentPhase * 500));
+        }
+
+        function minigameFindEye() {
+            qText.innerText = "KLIKNI NA OKO!";
+            btnContainer.innerHTML = "";
+            
+            const eye = document.createElement('div');
+            eye.id = 'eye-target';
+            eye.style.left = Math.random() * 80 + 'vw';
+            eye.style.top = Math.random() * 70 + 'vh';
+            
+            let clicks = 0;
+            const needed = 3 + currentPhase;
+            
+            eye.onclick = () => {
+                clicks++;
+                playWhisper();
+                if (clicks >= needed) {
+                    eye.remove();
+                    completeEvent();
+                } else {
+                    eye.style.left = Math.random() * 80 + 'vw';
+                    eye.style.top = Math.random() * 70 + 'vh';
+                }
+            };
+            
+            document.body.appendChild(eye);
+            
+            setTimeout(() => {
+                if (document.body.contains(eye)) {
+                    eye.remove();
+                    sanity -= 20;
+                    deathScreen("NEPODÍVAL SES DO OKA.");
+                }
+            }, 5000 - (currentPhase * 500));
+        }
+
+        function minigameMemory() {
+    const sequence = [];
+    const buttons = ['🔴', '🔵', '🟢', '🟡'];
+    const seqLength = 3 + currentPhase;
+    
+    for (let i = 0; i < seqLength; i++) {
+        sequence.push(buttons[Math.floor(Math.random() * buttons.length)]);
+    }
+    
+    qText.innerText = "ZAPAMATUJ SI SEKVENCI:";
+    
+    // Vytvoř container mimo wrapper pro zobrazení sekvence
+    const seqDisplay = document.createElement('div');
+    seqDisplay.id = 'memory-display';
+    seqDisplay.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); font-size:3em; z-index:250; background:black; padding:30px; border:3px solid red;';
+    seqDisplay.innerText = sequence.join(' ');
+    document.body.appendChild(seqDisplay);
+    
+    btnContainer.innerHTML = '';
+    
+    setTimeout(() => {
+        seqDisplay.remove();
+        qText.innerText = "ZADEJ SEKVENCI:";
+        
+        const userSeq = [];
+        
+        // Vytvoř button container mimo wrapper
+        const memoryBtns = document.createElement('div');
+        memoryBtns.id = 'memory-buttons';
+        memoryBtns.style.cssText = 'position:fixed; bottom:15%; left:50%; transform:translateX(-50%); display:flex; gap:20px; z-index:250;';
+        
+        buttons.forEach(btn => {
+            const b = document.createElement('button');
+            b.innerText = btn;
+            b.style.fontSize = '3em';
+            b.style.padding = '20px 30px';
+            b.style.background = 'black';
+            b.style.color = 'white';
+            b.style.border = '3px solid red';
+            b.style.cursor = 'pointer';
+            b.onclick = () => {
+                userSeq.push(btn);
+                playWhisper();
+                
+                if (userSeq.length === sequence.length) {
+                    memoryBtns.remove();
+                    if (JSON.stringify(userSeq) === JSON.stringify(sequence)) {
+                        completeEvent();
+                    } else {
+                        sanity -= 15;
+                        spawnRandomImage();
+                        deathScreen("ŠPATNÁ SEKVENCE!");
+                    }
+                }
+            };
+            memoryBtns.appendChild(b);
+        });
+        
+        document.body.appendChild(memoryBtns);
+    }, 2000 - (currentPhase * 200));
+}
+
+        function minigameCountdown() {
+            btnContainer.innerHTML = '';
+            let count = 3;
+            qText.innerHTML = `<div class="countdown-number">${count}</div>`;
+            
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    qText.innerHTML = `<div class="countdown-number">${count}</div>`;
+                    playBassBoom();
+                } else {
+                    clearInterval(interval);
+                    qText.innerHTML = `<div class="countdown-number">GO!</div>`;
+                    playHighPitchScreech();
+                    flashScreen();
+                    spawnRandomImage();
+                    setTimeout(completeEvent, 500);
+                }
+            }, 1000);
+        }
+
+        function minigameClickFast() {
+            qText.innerText = "KLIKEJ RYCHLE!";
+            let clicks = 0;
+            const needed = 10 + (currentPhase * 5);
+            let timeLeft = 3.0;
+            
+            btnContainer.innerHTML = `<button id="fast-btn" style="font-size:3em">KLIKNI! (0/${needed})</button>
+                                     <div style="font-size:2em; margin-top:20px">ČAS: <span id="time-left">3.0</span></div>`;
+            
+            const btn = document.getElementById('fast-btn');
+            const interval = setInterval(() => {
+                timeLeft -= 0.1;
+                const timeEl = document.getElementById('time-left');
+                if (timeEl) timeEl.innerText = timeLeft.toFixed(1);
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    if (clicks >= needed) completeEvent();
+                    else deathScreen("PŘÍLIŠ POMALÝ!");
+                }
+            }, 100);
+            
+            btn.onclick = () => {
+                clicks++;
+                btn.innerText = `KLIKNI! (${clicks}/${needed})`;
+                playWhisper();
+                if (clicks >= needed) {
+                    clearInterval(interval);
+                    completeEvent();
+                }
+            };
+        }
+
+        function minigameTypeWord() {
+            const words = ["BUNČEK", "ORB", "STRACH", "SMRT", "TEMNOTA", "CHAOS", "RITUAL", "ENTITY"];
+            const word = words[Math.floor(Math.random() * words.length)];
+            
+            qText.innerText = `NAPIŠ: ${word}`;
+            btnContainer.innerHTML = '<input type="text" id="word-input" style="font-size:2em; padding:10px; background:black; color:red; border:2px solid red;" autofocus>';
+            
+            const input = document.getElementById('word-input');
+            input.addEventListener('input', () => {
+                if (input.value.toUpperCase() === word) {
+                    completeEvent();
+                }
+            });
+            
+            setTimeout(() => {
+                if (document.getElementById('word-input')) {
+                    sanity -= 20;
+                    deathScreen("PŘÍLIŠ POMALÝ NA PSANÍ!");
+                }
+            }, 5000 - (currentPhase * 500));
+        }
+
+        function minigameChooseCorrect() {
+            const questions = [
+                { q: "KOLIK JE 2+2?", answers: ["3", "4", "5", "BUNČEK"], correct: 1 },
+                { q: "KDO JE DAN BUNČEK?", answers: ["ČLOVĚK", "ENTITA", "ORB", "VŠE"], correct: 3 },
+                { q: "CO VÍC BOLÍ?", answers: ["PRAVDA", "LEŽ", "SAMOTA", "BUNČEK"], correct: 3 },
+                { q: "KDE JSI?", answers: ["DOMA", "VENKU", "V PEKLE", "S BUNČKEM"], correct: 3 }
+            ];
+            
+            const quiz = questions[Math.floor(Math.random() * questions.length)];
+            qText.innerText = quiz.q;
+            btnContainer.innerHTML = '';
+            
+            quiz.answers.forEach((ans, idx) => {
+                const btn = document.createElement('button');
+                btn.innerText = ans;
+                btn.onclick = () => {
+                    if (idx === quiz.correct) {
+                        completeEvent();
+                    } else {
+                        sanity -= 10;
+                        spawnRandomImage();
+                        playHighPitchScreech();
+                        completeEvent();
+                    }
+                };
+                btnContainer.appendChild(btn);
+            });
+        }
+
+        function minigameDontBlink() {
+            qText.innerText = "NEMRKEJ! KOUKAT NA ORB!";
+            btnContainer.innerHTML = '<div style="font-size:2em">Zavři oči = smrt</div>';
+            
+            let blinkDetected = false;
+            const blinkCheck = (e) => {
+                if (e.key === ' ' || e.key === 'Escape') {
+                    blinkDetected = true;
+                    document.removeEventListener('keydown', blinkCheck);
+                    sanity -= 25;
+                    spawnRandomImage();
+                    deathScreen("MRKL JSI!");
+                }
+            };
+            
+            document.addEventListener('keydown', blinkCheck);
+            
+            setTimeout(() => {
+                document.removeEventListener('keydown', blinkCheck);
+                if (!blinkDetected) completeEvent();
+            }, 3000 + (currentPhase * 500));
+        }
+
+        function minigameRhythm() {
+            qText.innerText = "MAČKEJ KDYŽ BLIKNE!";
+            btnContainer.innerHTML = '<div id="rhythm-box" style="width:200px; height:200px; background:black; border:3px solid red; margin:auto"></div>';
+            
+            const box = document.getElementById('rhythm-box');
+            let hits = 0;
+            const needed = 5 + currentPhase;
+            let active = false;
+            
+            const keyHandler = (e) => {
+                if (e.code === 'Space') {
+                    if (active) {
+                        hits++;
+                        playWhisper();
+                        if (hits >= needed) {
+                            document.removeEventListener('keydown', keyHandler);
+                            completeEvent();
+                        }
+                    } else {
+                        sanity -= 10;
+                        playHighPitchScreech();
+                    }
+                }
+            };
+            
+            document.addEventListener('keydown', keyHandler);
+            
+            const blink = () => {
+                if (hits >= needed) return;
+                active = true;
+                box.style.background = 'red';
+                playBassBoom();
+                setTimeout(() => {
+                    active = false;
+                    box.style.background = 'black';
+                    setTimeout(blink, 1000 + Math.random() * 1500);
+                }, 300);
+            };
+            
+            setTimeout(blink, 1000);
+            
+            setTimeout(() => {
+                if (hits < needed) {
+                    document.removeEventListener('keydown', keyHandler);
+                    sanity -= 20;
+                    deathScreen("SELHAL JSI V RYTMU!");
+                }
+            }, 15000);
+        }
+
+    function minigameSequence() {
+    const nums = [1, 2, 3, 4, 5];
+    const shuffled = nums.sort(() => Math.random() - 0.5);
+    
+    qText.innerText = "KLIKNI OD NEJMENŠÍHO!";
+    btnContainer.innerHTML = '';
+    
+    let current = 1;
+    
+    shuffled.forEach(num => {
+        const btn = document.createElement('button');
+        btn.innerText = num;
+        btn.style.fontSize = '2em';
+        btn.onclick = () => {
+            if (num === current) {
+                current++;
+                btn.style.opacity = '0.3';
+                btn.disabled = true;
+                playWhisper();
+                if (current > shuffled.length) {
+                    completeEvent();
+                }
+            } else {
+                sanity -= 15;
+                spawnRandomImage();
+                deathScreen("ŠPATNÉ POŘADÍ!");
+            }
+        };
+        btnContainer.appendChild(btn);
+    });
+}
+
+        function minigameReaction() {
+            qText.innerText = "ČEKEJ...";
+            btnContainer.innerHTML = '<div style="font-size:2em">Připrav se...</div>';
+            
+            const waitTime = 2000 + Math.random() * 3000;
+            let clicked = false;
+            
+            const prematureClick = () => {
+                if (!clicked) {
+                    clicked = true;
+                    sanity -= 15;
+                    spawnRandomImage();
+                    deathScreen("PŘÍLIŠ BRZY!");
+                }
+            };
+            
+            document.addEventListener('click', prematureClick);
+            
+            setTimeout(() => {
+                document.removeEventListener('click', prematureClick);
+                
+                if (!clicked) {
+                    qText.innerText = "KLIKNI TEĎ!!!";
+                    btnContainer.innerHTML = '<button id="react-btn" style="font-size:3em; background:red; color:white">KLIKNI!</button>';
+                    playHighPitchScreech();
+                    flashScreen();
+                    
+                    const reactBtn = document.getElementById('react-btn');
+                    reactBtn.onclick = () => {
+                        completeEvent();
+                    };
+                    
+                    setTimeout(() => {
+                        if (document.getElementById('react-btn')) {
+                            sanity -= 20;
+                            deathScreen("PŘÍLIŠ POMALÝ!");
+                        }
+                    }, 1000);
+                }
+            }, waitTime);
+        }
+
+        function minigameHideSeek() {
+            qText.innerText = "SKRYJ SE! NEKLIKEJ!";
+            btnContainer.innerHTML = '<div style="font-size:2em; color:red">DAN BUNČEK TĚ HLEDÁ...</div>';
+            
+            let caught = false;
+            const trapClick = () => {
+                caught = true;
+                document.removeEventListener('click', trapClick);
+                sanity -= 25;
+                spawnRandomImage();
+                playBassBoom();
+                deathScreen("NAŠEL TĚ!");
+            };
+            
+            document.addEventListener('click', trapClick);
+            
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => spawnRandomImage(), i * 800);
+            }
+            
+            setTimeout(() => {
+                document.removeEventListener('click', trapClick);
+                if (!caught) {
+                    completeEvent();
+                }
+            }, 4000 + (currentPhase * 500));
+        }
+
+        function minigameGuessNumber() {
+            const targetNumber = Math.floor(Math.random() * (5)) + 1;
+            const maxNum = 5;
+            
+            qText.innerText = `HÁDEJ ČÍSLO 1-${maxNum}!`;
+            btnContainer.innerHTML = `
+                <div style="font-size:2em; margin-bottom:20px">BUNČEK MYSLÍ NA ČÍSLO...</div>
+                <input type="number" id="guess-input" min="1" max="${maxNum}" 
+                       style="font-size:2em; padding:10px; background:black; color:red; border:2px solid red; width:150px;" autofocus>
+                <button id="guess-btn" style="font-size:2em; margin-left:10px;">TIPNI!</button>
+                <div id="guess-hint" style="font-size:1.5em; margin-top:20px; color:yellow;"></div>
+            `;
+            
+            let attempts = 0;
+            const maxAttempts = 3 + currentPhase;
+            
+            const checkGuess = () => {
+                const input = document.getElementById('guess-input');
+                const hint = document.getElementById('guess-hint');
+                const guess = parseInt(input.value);
+                
+                if (isNaN(guess) || guess < 1 || guess > maxNum) {
+                    hint.innerText = "NEPLATNÉ ČÍSLO!";
+                    playHighPitchScreech();
+                    return;
+                }
+                
+                attempts++;
+                
+                if (guess === targetNumber) {
+                    playWhisper();
+                    completeEvent();
+                } else {
+                    const diff = Math.abs(guess - targetNumber);
+                    if (diff <= 2) {
+                        hint.innerText = "HORKO! " + (maxAttempts - attempts) + " pokusů zbývá";
+                    } else if (diff <= 5) {
+                        hint.innerText = "TEPLO! " + (maxAttempts - attempts) + " pokusů zbývá";
+                    } else {
+                        hint.innerText = "ZIMA! " + (maxAttempts - attempts) + " pokusů zbývá";
+                    }
+                    
+                    playHighPitchScreech();
+                    spawnRandomImage();
+                    
+                    if (attempts >= maxAttempts) {
+                        sanity -= 20;
+                        deathScreen(`BYLO TO ${targetNumber}!`);
+                    }
+                }
+                
+                input.value = '';
+                input.focus();
+            };
+            
+            document.getElementById('guess-btn').onclick = checkGuess;
+            document.getElementById('guess-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkGuess();
+            });
+            
+            setTimeout(() => {
+                if (document.getElementById('guess-input')) {
+                    sanity -= 25;
+                    deathScreen(`PŘÍLIŠ POMALÝ! BYLO TO ${targetNumber}`);
+                }
+            }, 10000 - (currentPhase * 1000));
+        }
+
+        function minigameMathQuiz() {
+            const operations = ['+', '-', '*'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2, correctAnswer;
+            
+            if (op === '*') {
+                num1 = Math.floor(Math.random() * (5 + currentPhase)) + 1;
+                num2 = Math.floor(Math.random() * (5 + currentPhase)) + 1;
+                correctAnswer = num1 * num2;
+            } else if (op === '+') {
+                num1 = Math.floor(Math.random() * (20 + currentPhase * 10)) + 1;
+                num2 = Math.floor(Math.random() * (20 + currentPhase * 10)) + 1;
+                correctAnswer = num1 + num2;
+            } else {
+                num1 = Math.floor(Math.random() * (30 + currentPhase * 10)) + 10;
+                num2 = Math.floor(Math.random() * num1) + 1;
+                correctAnswer = num1 - num2;
+            }
+            
+            const wrongAnswers = [
+                correctAnswer + Math.floor(Math.random() * 5) + 1,
+                correctAnswer - Math.floor(Math.random() * 5) - 1,
+                correctAnswer + Math.floor(Math.random() * 10) - 5
+            ];
+            
+            const allAnswers = [correctAnswer, ...wrongAnswers].sort(() => Math.random() - 0.5);
+            
+            qText.innerText = `SPOČÍTEJ: ${num1} ${op} ${num2} = ?`;
+            btnContainer.innerHTML = '';
+            
+            allAnswers.forEach(answer => {
+                const btn = document.createElement('button');
+                btn.innerText = answer;
+                btn.style.fontSize = '2.5em';
+                btn.onclick = () => {
+                    if (answer === correctAnswer) {
+                        playWhisper();
+                        completeEvent();
+                    } else {
+                        sanity -= 15;
+                        spawnRandomImage();
+                        playHighPitchScreech();
+                        deathScreen("ŠPATNĚ SPOČÍTÁNO!");
+                    }
+                };
+                btnContainer.appendChild(btn);
+            });
+            
+            setTimeout(() => {
+                if (btnContainer.children.length > 0) {
+                    sanity -= 20;
+                    deathScreen(`PŘÍLIŠ POMALÝ! BYLO TO ${correctAnswer}`);
+                }
+            }, 5000 - (currentPhase * 400));
+        }
+
+        function fakeSystemError() {
+            wrapper.style.display = 'none';
+            document.body.style.background = "blue";
+            const bsod = document.createElement('div');
+            bsod.id = 'bsod';
+            bsod.style.cssText = 'color:white; font-family:monospace; padding:50px; font-size:20px;';
+            bsod.innerHTML = `A problem has been detected and Windows has been shut down to prevent damage to your computer.<br><br>
+                             BUNCEK_DRIVER_IRQL_NOT_LESS_OR_EQUAL<br><br>
+                             Technical information:<br>
+                             *** STOP: 0x000000D4 (0xDBADB33F, 0x00000002, 0x00000000, 0xB00B1E5)<br><br>
+                             Deleting System32... <span id='del-prog'>0%</span>`;
+            document.body.appendChild(bsod);
+            
+            let prog = 0;
+            const int = setInterval(() => {
+                prog += Math.floor(Math.random() * 15);
+                const progEl = document.getElementById('del-prog');
+                if (progEl) progEl.innerText = prog + "%";
+                if (prog >= 100) {
+                    clearInterval(int);
+                    bsod.remove();
+                    document.body.style.background = "black";
+                    wrapper.style.display = 'block';
+                    playBassBoom();
+                    completeEvent();
+                }
+            }, 200);
+        }
+
+        function fakeNotification() {
+            const notifications = [
+                "Windows Defender: Dan Bunček detekován!",
+                "Vaše duše byla nahrána",
+                "Nová zpráva od: BUNČEK",
+                "Potvrzení objednávky: Tvoje duše",
+                "Kritická aktualizace: Instalace Bunčka",
+                "Někdo se dívá přes vaši kameru"
+            ];
+            
+            const notif = document.createElement('div');
+            notif.style.cssText = `position:fixed; top:20px; right:20px; background:#222; color:white; 
+                                   padding:20px; border:2px solid red; z-index:300; font-size:18px; max-width:300px;`;
+            notif.innerText = notifications[Math.floor(Math.random() * notifications.length)];
+            document.body.appendChild(notif);
+            playWhisper();
+            
+            setTimeout(() => notif.remove(), 2000);
+            setTimeout(completeEvent, 2100);
+        }
+
+        function triggerMegaJumpscare() {
+            playBassBoom();
+            playHighPitchScreech();
+            
+            const img = document.createElement('img');
+            img.src = BUNCEK_IMAGES[Math.floor(Math.random() * BUNCEK_IMAGES.length)];
+            img.className = 'jumpscare-fullscreen';
+            document.body.appendChild(img);
+            
+            flashScreen();
+            wrapper.classList.add('shake-brutal');
+            
+            setTimeout(() => {
+                img.remove();
+                wrapper.classList.remove('shake-brutal');
+                sanity -= 30;
+                completeEvent();
+            }, 1500);
+        }
+
+        function triggerGlitch() {
+            wrapper.classList.add('deep-fried');
+            wrapper.classList.add('shake-brutal');
+            setTimeout(() => {
+                wrapper.classList.remove('deep-fried');
+                wrapper.classList.remove('shake-brutal');
+            }, 200);
+        }
+
+        function spawnRandomImage() {
+            const img = document.createElement('img');
+            img.src = BUNCEK_IMAGES[Math.floor(Math.random() * BUNCEK_IMAGES.length)];
+
+            img.className = 'pop-up-img';
+            img.style.left = Math.random() * 70 + "vw";
+            img.style.top = Math.random() * 70 + "vh";
+            img.style.width = (Math.random() * 300 + 150) + "px";
+            
+            if (Math.random() > 0.5) img.classList.add('schizo-invert');
+
+            document.body.appendChild(img);
+            playHighPitchScreech();
+
+            setTimeout(() => {
+                img.remove();
+            }, 400 + Math.random() * 800);
+        }
+
+        function flashScreen() {
+            const flash = document.getElementById('overlay-flash');
+            flash.style.opacity = '1';
+            setTimeout(() => {
+                flash.style.opacity = '0';
+            }, 100);
+        }
+
+        function deathScreen(reason) {
+            gameActive = false;
+            document.body.innerHTML = `
+                <div style='color:red; text-align:center; margin-top:15%; font-family: VT323, monospace;'>
+                    <h1 style='font-size:5em; text-shadow: 5px 5px 10px black;'>${reason}</h1>
+                    <h2 style='font-size:3em; margin-top:30px;'>GAME OVER</h2>
+                    <p style='font-size:2em; margin-top:30px;'>Dosaženo FÁZE ${currentPhase + 1}</p>
+                    <p style='font-size:2em;'>Oběti: ${victims}</p>
+                    <p style='font-size:2em;'>Sanity: ${sanity}%</p>
+                    <p onclick='location.reload()' style='cursor:pointer; border:3px solid red; display:inline-block; 
+                       padding:20px 40px; margin-top:40px; font-size:2em; background:black;'>RESTART</p>
+                </div>
+            `;
+            playBassBoom();
+            playDeepDrone();
+        }
+
+        function updateHUD() {
+            hudSanity.innerText = "SANITY: " + Math.max(0, sanity) + "%";
+            hudScore.innerText = "OBĚTI: " + victims;
+            if (sanity <= 0) deathScreen("TVÁ MYSL JE ZTRACENA.");
+            chaosLevel = Math.floor(victims / 10) + 1;
+            
+            if (sanity < 30) {
+                wrapper.classList.add('red-tint');
+            } else {
+                wrapper.classList.remove('red-tint');
+            }
+        }
+
+    </script>
+</body>
+</html>
